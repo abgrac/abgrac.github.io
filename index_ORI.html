@@ -1,0 +1,50 @@
+<h1 id="gtfo">gtfo</h1>
+
+<style>
+  h1 {
+    /* text-align: center; */
+    font-size: 30vmin;
+    color: #FFFFFF;
+
+    /* height: 10%; */
+    /* width: 10%; */
+    background: black;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+
+    /* margin-top: -100px; */
+    /* margin-left: -200px; */
+
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+  }
+</style>
+
+<script>
+  var bDelay = 1500;
+  var wDelay = 30;
+
+  window.onload = White;
+
+  function White() {
+    document.body.style.backgroundColor = "white";
+    document.getElementById("gtfo").style.display = "none";
+    // document.getElementById("gtfo").style.visibility = "hidden";
+    setTimeout(Black, bDelay)
+
+  }
+  function Black() { //flick
+    document.getElementById("gtfo").innerHTML = (Math.random()>0.5?'G':'g') + (Math.random()>0.5?'T':'t') + (Math.random()>0.5?'F':'f') + (Math.random()>0.5?'O':'o');
+    document.body.style.backgroundColor = "black";
+    document.getElementById("gtfo").style.display = "block";
+    // document.getElementById("gtfo").style.visibility = "visible";
+    setTimeout(White, wDelay)
+
+  }
+</script>
