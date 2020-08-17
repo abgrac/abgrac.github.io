@@ -1,53 +1,10 @@
-<h1 id="gtfo">gtfo</h1>
+<!DOCTYPE html>
+<html>
 
-<style>
-  h1 {
-    /* text-align: center; */
-    font-size: 30vmin;
-    color: #FFFFFF;
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    /* height: 10%; */
-    /* width: 10%; */
-    background: black;
-
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -100%);
-
-    /* margin-top: -100px; */
-    /* margin-left: -200px; */
-
-   -moz-user-select: -moz-none;
-   -khtml-user-select: none;
-   -webkit-user-select: none;
-   -ms-user-select: none;
-   user-select: none;
-  }
-</style>
-
-<script>
-  var bDelay = 1500;
-  var wDelay = 30;
-
-  window.onload = White;
-
-  function White() {
-    document.body.style.backgroundColor = "white";
-    document.getElementById("gtfo").style.display = "none";
-    // document.getElementById("gtfo").style.visibility = "hidden";
-    setTimeout(Black, bDelay)
-
-  }
-  function Black() { //flick
-    document.getElementById("gtfo").innerHTML = (Math.random()>0.5?'G':'g') + (Math.random()>0.5?'T':'t') + (Math.random()>0.5?'F':'f') + (Math.random()>0.5?'O':'o');
-    document.body.style.backgroundColor = "black";
-    document.getElementById("gtfo").style.display = "block";
-    // document.getElementById("gtfo").style.visibility = "visible";
-    setTimeout(White, wDelay)
-
-  }
-</script>
+    <title>Zytro Hub</title>
 
     <!-- Babylon.js -->
     <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
@@ -59,7 +16,11 @@
     <script src="https://preview.babylonjs.com/earcut.min.js"></script>
     <script src="https://preview.babylonjs.com/babylon.js"></script>
     <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
     <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
     <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
 
     <style>
