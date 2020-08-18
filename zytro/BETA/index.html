@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<title>Zytro Hub</title>
+
+	<!-- Babylon.js -->
+	<script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+	<script src="https://preview.babylonjs.com/ammo.js"></script>
+	<script src="https://preview.babylonjs.com/cannon.js"></script>
+	<script src="https://preview.babylonjs.com/Oimo.js"></script>
+	<script src="https://preview.babylonjs.com/libktx.js"></script>
+	<script src="https://preview.babylonjs.com/earcut.min.js"></script>
+	<script src="https://preview.babylonjs.com/babylon.js"></script>
+	<script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+	<script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+	<script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+	<script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+	<script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+	<script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+	<script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+
+	<style>
+		html,
+		body {
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		#renderCanvas {
+			width: 100%;
+			height: 100%;
+			touch-action: none;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="renderCanvas"></canvas>
+	<script>
+		var canvas = document.getElementById("renderCanvas");
+
+		var engine = null;
+		var scene = null;
+		var sceneToRender = null;
+		var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
+
+		var texUV;
+		var texMask1;
+		var texMask2;
+		var texAlpha1;
+		var texAlpha2;
+		// var texUV ;
+		// var texUV ;
+		// var texCustomK;
+		var texCustomR;
+		var texCustomG;
+		var texCustomB;
+		var texCustomC;
+		var texCustomM;
+		var texCustomY;
+		var texCustomW;
+
+		var texBeauty = "https://abgrac.github.io/zytro/render_FStormMaterialIdChannel.png";
+		var imgW = 2048;
+		var imgH = 2048;
+		const imgBty = new Image();
+		imgBty.onload = function () {
+			imgW = this.width;
+			imgH = this.height;
+			scene = createScene();
+			sceneToRender = scene;
+		}
+
+		imgBty.src = texBeauty;
+		var texDiff;
+		// var texSpec;
+		var texRefl;
+		var texOccl;
+
+		var texA_x = new BABYLON.GUI.Slider();
+		var texA_y = new BABYLON.GUI.Slider();
+		var texA_s = new BABYLON.GUI.Slider();
+		var texA_r = new BABYLON.GUI.Slider();
+		var texA_b = new BABYLON.GUI.Slider();
+		var texA_c = new BABYLON.GUI.Slider();
+		var texA_cm = new BABYLON.GUI.Slider();
+		var texA_col = new BABYLON.Color4(1, 0, 0, 1);
+		var texB_x = new BABYLON.GUI.Slider();
+		var texB_y = new BABYLON.GUI.Slider();
+		var texB_s = new BABYLON.GUI.Slider();
+		var texB_r = new BABYLON.GUI.Slider();
+		var texB_b = new BABYLON.GUI.Slider();
+		var texB_c = new BABYLON.GUI.Slider();
+		var texB_cm = new BABYLON.GUI.Slider();
+		var texB_col = new BABYLON.Color4(0, 1, 0, 1);
+		var texC_x = new BABYLON.GUI.Slider();
+		var texC_y = new BABYLON.GUI.Slider();
+		var texC_s = new BABYLON.GUI.Slider();
+		var texC_r = new BABYLON.GUI.Slider();
+		var texC_b = new BABYLON.GUI.Slider();
+		var texC_c = new BABYLON.GUI.Slider();
+		var texC_cm = new BABYLON.GUI.Slider();
+		var texC_col = new BABYLON.Color4(0, 0, 1, 1);
+
+		var texD_x = new BABYLON.GUI.Slider();
+		var texD_y = new BABYLON.GUI.Slider();
+		var texD_s = new BABYLON.GUI.Slider();
+		var texD_r = new BABYLON.GUI.Slider();
+		var texD_b = new BABYLON.GUI.Slider();
+		var texD_c = new BABYLON.GUI.Slider();
+		var texD_cm = new BABYLON.GUI.Slider();
+		var texD_col = new BABYLON.Color4(0, 1, 1, 1);
+
+		var texE_x = new BABYLON.GUI.Slider();
+		var texE_y = new BABYLON.GUI.Slider();
+		var texE_s = new BABYLON.GUI.Slider();
+		var texE_r = new BABYLON.GUI.Slider();
+		var texE_b = new BABYLON.GUI.Slider();
+		var texE_c = new BABYLON.GUI.Slider();
+		var texE_cm = new BABYLON.GUI.Slider();
+		var texE_col = new BABYLON.Color4(1, 0, 1, 1);
+
+		var texF_x = new BABYLON.GUI.Slider();
+		var texF_y = new BABYLON.GUI.Slider();
+		var texF_s = new BABYLON.GUI.Slider();
+		var texF_r = new BABYLON.GUI.Slider();
+		var texF_b = new BABYLON.GUI.Slider();
+		var texF_c = new BABYLON.GUI.Slider();
+		var texF_cm = new BABYLON.GUI.Slider();
+		var texF_col = new BABYLON.Color4(1, 1, 0, 1);
+
+
+
+		var createScene = function () {
+			var scene = new BABYLON.Scene(engine);
+			scene.clearColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+
+			var size = 1.0;
+			// var imgW = 768;
+			// var imgH = 1024;
+			var imgAspect = imgW / imgH;
+			var planeW, planeH;
+			// var canvasW = scene.getEngine().getRenderingCanvasClientRect().width;
+			// var canvasH = scene.getEngine().getRenderingCanvasClientRect().height;
+			var canvasW = canvas.width;
+			var canvasH = canvas.height;
+
+			var cvAspect = canvasW / canvasH;
+
+			if (imgAspect > cvAspect) {
+				planeW = canvasW;
+				planeH = planeW / imgAspect;
+			}
+			else {
+				planeH = canvasH;
+				planeW = planeH * imgAspect;
+			}
+
+			var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 100, 0), scene);
+			camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+
+			var distance = 10;
+
+			camera.orthoLeft = -canvasW / 2;
+			camera.orthoRight = canvasW / 2;
+			camera.orthoBottom = camera.orthoLeft / cvAspect;
+			camera.orthoTop = camera.orthoRight / cvAspect;
+
+			camera.setTarget(BABYLON.Vector3.Zero());
+			// camera.attachControl(canvas, false);
+			// camera.lockedTarget = plane;
+
+			var sphere = BABYLON.MeshBuilder.CreateSphere('sphere', { segments: 4, diameter: 0 }, scene);
+			var plane = BABYLON.MeshBuilder.CreateGround('plane', { width: planeW * size, height: planeH * size / 1.0, subdivisions: 0 }, scene);
+			plane.rotate(BABYLON.Axis.Y, Math.PI);
+			sphere.translate(BABYLON.Axis.Y, +100);
+
+			// Another GUI on the right
+			var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+			advancedTexture.layer.layerMask = 2;
+
+
+			var sphereMat = new BABYLON.StandardMaterial("sphereMat", scene);
+			var planeMat = new BABYLON.StandardMaterial("planeMat", scene);
+			sphereMat.emissiveColor = new BABYLON.Color3(1, 0, 1);
+			planeMat.backFaceCulling = true;
+
+			var samplingModeA = BABYLON.Texture.TRILINEAR_SAMPLINGMODE; //NEAREST_SAMPLINGMODE WRONG!!
+			var samplingModeB = BABYLON.Texture.TRILINEAR_SAMPLINGMODE;
+			texBeauty = new BABYLON.Texture("/renderPollen/2nd B Meeting Room_beauty element.png", scene, false, true, samplingModeB);
+			texDiff = new BABYLON.Texture("/renderPollen/Pollen_Light.png", scene, false, true, samplingModeB);
+			texOccl = new BABYLON.Texture("/renderPollen/2nd B Meeting Room_FStormAO.png", scene, false, true, samplingModeB);
+			texRefl = new BABYLON.Texture("/renderPollen/2nd B Meeting Room_FStormIndirectReflections.png", scene, false, true, samplingModeB);
+			// texSpec = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/h_spec.jpg", scene, false, true, samplingModeB);
+
+			// var texDiff = new BABYLON.Texture("https://abgrac.github.io/zytro/D/h_diff.jpg", scene, false, true, samplingModeB);
+			// var texSpec = new BABYLON.Texture("https://abgrac.github.io/zytro/D/h_spec.jpg", scene, false, true, samplingModeB);
+			// var texRefl = new BABYLON.Texture("https://abgrac.github.io/zytro/D/h_refl.jpg", scene, false, true, samplingModeB);
+			// var texOccl = new BABYLON.Texture("https://abgrac.github.io/zytro/D/h_occl.jpg", scene, false, true, samplingModeB);
+			// texUV = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/uv.png", scene, false, true, samplingModeB);
+			// texUV = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/new.png", scene, false, true, samplingModeB); //invert
+			// texUV = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/Sala_FStormUVW_1024_urb.png", scene, false, true, samplingModeB);
+			// texUV = new BABYLON.Texture("/urbvga/Cena_FStormUVW_1024_src.png", scene, false, true, samplingModeB);
+			// texUV = new BABYLON.Texture("/render4/render/fbserg.png", scene, false, true, samplingModeB);
+			texUV = new BABYLON.Texture("/renderPollen/Pollen_UVW_2048x2048_URB.png", scene, false, true, samplingModeA);
+			// texMask1 = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/Sala_ID_01.jpg", scene, false, true, samplingModeB);
+			// texMask1 = new BABYLON.Texture("urbvga/Cena_FStormUVW_1024_src.png", scene, false, true, samplingModeB);
+			texMask1 = new BABYLON.Texture("/renderPollen/Pollen_ID1.png", scene, false, true, samplingModeA);
+			texMask2 = new BABYLON.Texture("/renderPollen/Pollen_ID3.png", scene, false, true, samplingModeA);
+			texAlpha2 = new BABYLON.Texture("/renderPollen/Pollen_ID3_alpha.png", scene, false, true, samplingModeA);
+			// texMask1.updateSamplingMode(1);
+			// texMask2.updateSamplingMode(1);
+			// var texUV = new BABYLON.Texture("https://abgrac.github.io/zytro/render_FStormUVW_1024.png", scene, false, true, samplingModeB);
+			// var texUV = new BABYLON.Texture("https://abgrac.github.io/zytro/urbvga/urbvga_encVS_mesa.png", scene, false, true, samplingModeB);
+			texCustomK = new BABYLON.Texture("/urbvga/Sketchfab_UV_Checker_8k.png", scene, false, true, samplingModeB);
+			texCustomR = new BABYLON.Texture("/texs/tex_2.jpg", scene, false, true, samplingModeB);
+			texCustomG = new BABYLON.Texture("/texs/tex_5.jpg", scene, false, true, samplingModeB);
+			texCustomB = new BABYLON.Texture("/texs/hub/Carpet_01.jpg", scene, false, true, samplingModeB);
+			texCustomC = new BABYLON.Texture("/texs/tex_1.jpg", scene, false, true, samplingModeB);
+			texCustomM = new BABYLON.Texture("/texs/tex_3.jpg", scene, false, true, samplingModeB);
+			texCustomY = new BABYLON.Texture("/texs/tex_4.jpg", scene, false, true, samplingModeB);
+			texCustomW = new BABYLON.Texture("/texs/tex_6.jpg", scene, false, true, samplingModeB);
+			// texCustomR = texCustomK; texCustomG = texCustomK; texCustomB = texCustomK;
+
+
+			// TEX_A
+			var panelTA = new BABYLON.GUI.StackPanel();
+			panelTA.width = "220px";
+			panelTA.left = 0.5;
+			panelTA.fontSize = "14px";
+			panelTA.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			panelTA.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+			advancedTexture.addControl(panelTA);
+
+			texA_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_x.minimum = -1;
+			texA_x.maximum = 1;
+			texA_x.color = "green";
+			texA_x.value = 0;
+			texA_x.height = "20px";
+			texA_x.width = "200px";
+			panelTA.addControl(texA_x);
+			texA_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_y.minimum = -1;
+			texA_y.maximum = 1;
+			texA_y.color = "green";
+			texA_y.value = 0;
+			texA_y.height = "20px";
+			texA_y.width = "200px";
+			panelTA.addControl(texA_y);
+			texA_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_s.minimum = 0;
+			texA_s.maximum = 4;
+			texA_s.color = "red";
+			texA_s.value = 1;
+			texA_s.height = "20px";
+			texA_s.width = "200px";
+			panelTA.addControl(texA_s);
+			texA_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_r.minimum = -2;
+			texA_r.maximum = 2;
+			texA_r.color = "blue";
+			texA_r.value = 0;
+			texA_r.height = "20px";
+			texA_r.width = "200px";
+			panelTA.addControl(texA_r);
+			texA_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_b.minimum = -0.5;
+			texA_b.maximum = 0.5;
+			texA_b.color = "white";
+			texA_b.value = 0;
+			texA_b.height = "20px";
+			texA_b.width = "200px";
+			panelTA.addControl(texA_b);
+			texA_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_c.minimum = 0;
+			texA_c.maximum = 2;
+			texA_c.color = "black";
+			texA_c.value = 1;
+			texA_c.height = "20px";
+			texA_c.width = "200px";
+			panelTA.addControl(texA_c);
+			texA_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texA_cm.minimum = 0;
+			texA_cm.maximum = 1;
+			texA_cm.color = "purple";
+			texA_cm.value = 0;
+			texA_cm.height = "20px";
+			texA_cm.width = "200px";
+			panelTA.addControl(texA_cm);
+
+			// TEX_B
+			var panelTB = new BABYLON.GUI.StackPanel();
+			panelTB.width = "220px";
+			panelTB.fontSize = "14px";
+			panelTB.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			panelTB.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+			advancedTexture.addControl(panelTB);
+
+			texB_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_x.minimum = -1;
+			texB_x.maximum = 1;
+			texB_x.color = "green";
+			texB_x.value = 0;
+			texB_x.height = "20px";
+			texB_x.width = "200px";
+			panelTB.addControl(texB_x);
+			texB_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_y.minimum = -1;
+			texB_y.maximum = 1;
+			texB_y.color = "green";
+			texB_y.value = 0;
+			texB_y.height = "20px";
+			texB_y.width = "200px";
+			panelTB.addControl(texB_y);
+			texB_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_s.minimum = 0;
+			texB_s.maximum = 4;
+			texB_s.color = "red";
+			texB_s.value = 1;
+			texB_s.height = "20px";
+			texB_s.width = "200px";
+			panelTB.addControl(texB_s);
+			texB_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_r.minimum = -2;
+			texB_r.maximum = 2;
+			texB_r.color = "blue";
+			texB_r.value = 0;
+			texB_r.height = "20px";
+			texB_r.width = "200px";
+			panelTB.addControl(texB_r);
+			texB_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_b.minimum = -0.5;
+			texB_b.maximum = 0.5;
+			texB_b.color = "white";
+			texB_b.value = 0;
+			texB_b.height = "20px";
+			texB_b.width = "200px";
+			panelTB.addControl(texB_b);
+			texB_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_c.minimum = 0;
+			texB_c.maximum = 2;
+			texB_c.color = "black";
+			texB_c.value = 1;
+			texB_c.height = "20px";
+			texB_c.width = "200px";
+			panelTB.addControl(texB_c);
+			texB_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texB_cm.minimum = 0;
+			texB_cm.maximum = 1;
+			texB_cm.color = "purple";
+			texB_cm.value = 0;
+			texB_cm.height = "20px";
+			texB_cm.width = "200px";
+			panelTB.addControl(texB_cm);
+
+			// TEX_C
+			var panelTC = new BABYLON.GUI.StackPanel();
+			panelTC.width = "220px";
+			panelTC.fontSize = "14px";
+			panelTC.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			panelTC.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+			advancedTexture.addControl(panelTC);
+
+			texC_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_x.minimum = -1;
+			texC_x.maximum = 1;
+			texC_x.color = "green";
+			texC_x.value = 0;
+			texC_x.height = "20px";
+			texC_x.width = "200px";
+			panelTC.addControl(texC_x);
+			texC_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_y.minimum = -1;
+			texC_y.maximum = 1;
+			texC_y.color = "green";
+			texC_y.value = 0;
+			texC_y.height = "20px";
+			texC_y.width = "200px";
+			panelTC.addControl(texC_y);
+			texC_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_s.minimum = 0;
+			texC_s.maximum = 4;
+			texC_s.color = "red";
+			texC_s.value = 1;
+			texC_s.height = "20px";
+			texC_s.width = "200px";
+			panelTC.addControl(texC_s);
+			texC_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_r.minimum = -2;
+			texC_r.maximum = 2;
+			texC_r.color = "blue";
+			texC_r.value = 0;
+			texC_r.height = "20px";
+			texC_r.width = "200px";
+			panelTC.addControl(texC_r);
+			texC_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_b.minimum = -0.5;
+			texC_b.maximum = 0.5;
+			texC_b.color = "white";
+			texC_b.value = 0;
+			texC_b.height = "20px";
+			texC_b.width = "200px";
+			panelTC.addControl(texC_b);
+			texC_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_c.minimum = 0;
+			texC_c.maximum = 2;
+			texC_c.color = "black";
+			texC_c.value = 1;
+			texC_c.height = "20px";
+			texC_c.width = "200px";
+			panelTC.addControl(texC_c);
+			texC_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texC_cm.minimum = 0;
+			texC_cm.maximum = 1;
+			texC_cm.color = "purple";
+			texC_cm.value = 0;
+			texC_cm.height = "20px";
+			texC_cm.width = "200px";
+			panelTC.addControl(texC_cm);
+
+			// TEX_D
+			var panelTD = new BABYLON.GUI.StackPanel();
+			panelTD.width = "220px";
+			panelTD.fontSize = "14px";
+			panelTD.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			panelTD.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+			advancedTexture.addControl(panelTD);
+
+			texD_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_x.minimum = -1;
+			texD_x.maximum = 1;
+			texD_x.color = "green";
+			texD_x.value = 0;
+			texD_x.height = "20px";
+			texD_x.width = "200px";
+			panelTD.addControl(texD_x);
+			texD_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_y.minimum = -1;
+			texD_y.maximum = 1;
+			texD_y.color = "green";
+			texD_y.value = 0;
+			texD_y.height = "20px";
+			texD_y.width = "200px";
+			panelTD.addControl(texD_y);
+			texD_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_s.minimum = 0;
+			texD_s.maximum = 4;
+			texD_s.color = "red";
+			texD_s.value = 1;
+			texD_s.height = "20px";
+			texD_s.width = "200px";
+			panelTD.addControl(texD_s);
+			texD_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_r.minimum = -2;
+			texD_r.maximum = 2;
+			texD_r.color = "blue";
+			texD_r.value = 0;
+			texD_r.height = "20px";
+			texD_r.width = "200px";
+			panelTD.addControl(texD_r);
+			texD_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_b.minimum = -0.5;
+			texD_b.maximum = 0.5;
+			texD_b.color = "white";
+			texD_b.value = 0;
+			texD_b.height = "20px";
+			texD_b.width = "200px";
+			panelTD.addControl(texD_b);
+			texD_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_c.minimum = 0;
+			texD_c.maximum = 2;
+			texD_c.color = "black";
+			texD_c.value = 1;
+			texD_c.height = "20px";
+			texD_c.width = "200px";
+			panelTD.addControl(texD_c);
+			texD_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			texD_cm.minimum = 0;
+			texD_cm.maximum = 1;
+			texD_cm.color = "purple";
+			texD_cm.value = 0;
+			texD_cm.height = "20px";
+			texD_cm.width = "200px";
+			panelTD.addControl(texD_cm);
+
+			// TEX_E
+			var panelTE = new BABYLON.GUI.StackPanel();
+			panelTE.width = "220px";
+			panelTE.fontSize = "14px";
+			panelTE.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			panelTE.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+			advancedTexture.addControl(panelTE);
+
+			texE_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_x.minimum = -1;
+			texE_x.maximum = 1;
+			texE_x.color = "green";
+			texE_x.value = 0;
+			texE_x.height = "20px";
+			texE_x.width = "200px";
+			panelTE.addControl(texE_x);
+			texE_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_y.minimum = -1;
+			texE_y.maximum = 1;
+			texE_y.color = "green";
+			texE_y.value = 0;
+			texE_y.height = "20px";
+			texE_y.width = "200px";
+			panelTE.addControl(texE_y);
+			texE_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_s.minimum = 0;
+			texE_s.maximum = 4;
+			texE_s.color = "red";
+			texE_s.value = 1;
+			texE_s.height = "20px";
+			texE_s.width = "200px";
+			panelTE.addControl(texE_s);
+			texE_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_r.minimum = -2;
+			texE_r.maximum = 2;
+			texE_r.color = "blue";
+			texE_r.value = 0;
+			texE_r.height = "20px";
+			texE_r.width = "200px";
+			panelTE.addControl(texE_r);
+			texE_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_b.minimum = -0.5;
+			texE_b.maximum = 0.5;
+			texE_b.color = "white";
+			texE_b.value = 0;
+			texE_b.height = "20px";
+			texE_b.width = "200px";
+			panelTE.addControl(texE_b);
+			texE_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_c.minimum = 0;
+			texE_c.maximum = 2;
+			texE_c.color = "black";
+			texE_c.value = 1;
+			texE_c.height = "20px";
+			texE_c.width = "200px";
+			panelTE.addControl(texE_c);
+			texE_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			texE_cm.minimum = 0;
+			texE_cm.maximum = 1;
+			texE_cm.color = "purple";
+			texE_cm.value = 0.0;
+			texE_cm.height = "20px";
+			texE_cm.width = "200px";
+			panelTE.addControl(texE_cm);
+
+			// TEX_F
+			var panelTF = new BABYLON.GUI.StackPanel();
+			panelTF.width = "220px";
+			panelTF.fontSize = "14px";
+			panelTF.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			panelTF.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+			advancedTexture.addControl(panelTF);
+
+			texF_x.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_x.minimum = -1;
+			texF_x.maximum = 1;
+			texF_x.color = "green";
+			texF_x.value = 0;
+			texF_x.height = "20px";
+			texF_x.width = "200px";
+			panelTF.addControl(texF_x);
+			texF_y.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_y.minimum = -1;
+			texF_y.maximum = 1;
+			texF_y.color = "green";
+			texF_y.value = 0;
+			texF_y.height = "20px";
+			texF_y.width = "200px";
+			panelTF.addControl(texF_y);
+			texF_s.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_s.minimum = 0;
+			texF_s.maximum = 4;
+			texF_s.color = "red";
+			texF_s.value = 1;
+			texF_s.height = "20px";
+			texF_s.width = "200px";
+			panelTF.addControl(texF_s);
+			texF_r.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_r.minimum = -2;
+			texF_r.maximum = 2;
+			texF_r.color = "blue";
+			texF_r.value = 0;
+			texF_r.height = "20px";
+			texF_r.width = "200px";
+			panelTF.addControl(texF_r);
+			texF_b.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_b.minimum = -0.5;
+			texF_b.maximum = 0.5;
+			texF_b.color = "white";
+			texF_b.value = 0;
+			texF_b.height = "20px";
+			texF_b.width = "200px";
+			panelTF.addControl(texF_b);
+			texF_c.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_c.minimum = 0;
+			texF_c.maximum = 2;
+			texF_c.color = "black";
+			texF_c.value = 1;
+			texF_c.height = "20px";
+			texF_c.width = "200px";
+			panelTF.addControl(texF_c);
+			texF_cm.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+			texF_cm.minimum = 0;
+			texF_cm.maximum = 1;
+			texF_cm.color = "purple";
+			texF_cm.value = 0;
+			texF_cm.height = "20px";
+			texF_cm.width = "200px";
+			panelTF.addControl(texF_cm);
+
+			var panel = new BABYLON.GUI.StackPanel();
+			panel.width = "20px";
+			panel.height = "20px";
+			panel.isVertical = false;
+			panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+			panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+			advancedTexture.addControl(panel);
+			var checkbox = new BABYLON.GUI.Checkbox();
+			checkbox.width = "20px";
+			checkbox.height = "20px";
+			checkbox.isChecked = true;
+			checkbox.color = "cyan";
+			checkbox.onIsCheckedChangedObservable.add(function (value) {
+				shaderMat.setInt('_btySwitch', value ? 1 : 0);
+			});
+			panel.addControl(checkbox);
+
+
+			texA_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftA', texA_x.value);
+			});
+			texA_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftA', texA_y.value);
+			});
+			texA_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeA', texA_s.value);
+				shaderMat.setFloat('_ySizeA', texA_s.value);
+			});
+			texA_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateA', texA_r.value);
+			});
+			texA_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briA', texA_b.value);
+			});
+			texA_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conA', texA_c.value);
+			});
+			texA_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmA', texA_cm.value);
+			});
+
+
+			texB_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftB', texB_x.value);
+			});
+			texB_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftB', texB_y.value);
+			});
+			texB_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeB', texB_s.value);
+				shaderMat.setFloat('_ySizeB', texB_s.value);
+			});
+			texB_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateB', texB_r.value);
+			});
+			texB_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briB', texB_b.value);
+			});
+			texB_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conB', texB_c.value);
+			});
+			texB_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmB', texB_cm.value);
+			});
+
+
+			texC_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftC', texC_x.value);
+			});
+			texC_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftC', texC_y.value);
+			});
+			texC_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeC', texC_s.value);
+				shaderMat.setFloat('_ySizeC', texC_s.value);
+			});
+			texC_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateC', texC_r.value);
+			});
+			texC_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briC', texC_b.value);
+			});
+			texC_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conC', texC_c.value);
+			});
+			texC_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmC', texC_cm.value);
+			});
+			texC_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftC', texC_x.value);
+			});
+
+
+			texD_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftD', texD_x.value);
+			});
+			texD_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftD', texD_y.value);
+			});
+			texD_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeD', texD_s.value);
+				shaderMat.setFloat('_ySizeD', texD_s.value);
+			});
+			texD_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateD', texD_r.value);
+			});
+			texD_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briD', texD_b.value);
+			});
+			texD_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conD', texD_c.value);
+			});
+			texD_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmD', texD_cm.value);
+			});
+
+
+			texE_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftE', texE_x.value);
+			});
+			texE_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftE', texE_y.value);
+			});
+			texE_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeE', texE_s.value);
+				shaderMat.setFloat('_ySizeE', texE_s.value);
+			});
+			texE_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateE', texE_r.value);
+			});
+			texE_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briE', texE_b.value);
+			});
+			texE_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conE', texE_c.value);
+			});
+			texE_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmE', texE_cm.value);
+			});
+
+
+			texF_x.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xShiftF', texF_x.value);
+			});
+			texF_y.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_yShiftF', texF_y.value);
+			});
+			texF_s.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_xSizeF', texF_s.value);
+				shaderMat.setFloat('_ySizeF', texF_s.value);
+			});
+			texF_r.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_uvRotateF', texF_r.value);
+			});
+			texF_b.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_briF', texF_b.value);
+			});
+			texF_c.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_conF', texF_c.value);
+			});
+			texF_cm.onValueChangedObservable.add(function (value) {
+				shaderMat.setFloat('_cmF', texF_cm.value);
+			});
+
+			//TODO
+			//onCOlorChange>
+			// shaderMat.setColor4('_colC', texC_col);
+
+
+			var shaderMat = new BABYLON.ShaderMaterial("shader", scene, {
+				vertex: "custom",
+				fragment: "custom",
+			},
+				{
+					attributes: ["position", "normal", "uv"],
+					uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "uTime"]
+				});
+
+			shaderMat.setTexture("texBeauty", texBeauty);
+			shaderMat.setTexture("texDiff", texDiff);
+			// shaderMat.setTexture("texSpec", texSpec);
+			shaderMat.setTexture("texRefl", texRefl);
+			shaderMat.setTexture("texOccl", texOccl);
+			shaderMat.setTexture("texMask1", texMask1);
+			shaderMat.setTexture("texMask2", texMask2);
+			shaderMat.setTexture("texAlpha2", texAlpha2);
+			shaderMat.setTexture("texCustomR", texCustomR);
+			shaderMat.setTexture("texCustomG", texCustomG);
+			shaderMat.setTexture("texCustomB", texCustomB);
+			shaderMat.setTexture("texCustomC", texCustomC);
+			shaderMat.setTexture("texCustomM", texCustomM);
+			shaderMat.setTexture("texCustomY", texCustomY);
+			shaderMat.setTexture("texCustomW", texCustomW);
+			shaderMat.setTexture("texUV", texUV);
+
+
+			shaderMat.setFloat('_xSizeA', texA_s.value);
+			shaderMat.setFloat('_ySizeA', texA_s.value);
+			shaderMat.setFloat('_xShiftA', texA_x.value);
+			shaderMat.setFloat('_yShiftA', texA_y.value);
+			shaderMat.setFloat('_uvRotateA', texA_r.value);
+			shaderMat.setFloat('_briA', texA_b.value);
+			shaderMat.setFloat('_conA', texA_c.value);
+			shaderMat.setFloat('_cmA', texA_cm.value);
+			shaderMat.setColor4("_colA", texA_col);
+			shaderMat.setFloat('_xSizeB', texB_s.value);
+			shaderMat.setFloat('_ySizeB', texB_s.value);
+			shaderMat.setFloat('_xShiftB', texB_x.value);
+			shaderMat.setFloat('_yShiftB', texB_y.value);
+			shaderMat.setFloat('_uvRotateB', texB_r.value);
+			shaderMat.setFloat('_briB', texB_b.value);
+			shaderMat.setFloat('_conB', texB_c.value);
+			shaderMat.setFloat('_cmB', texB_cm.value);
+			shaderMat.setColor4("_colB", texB_col);
+			shaderMat.setFloat('_xSizeC', texC_s.value);
+			shaderMat.setFloat('_ySizeC', texC_s.value);
+			shaderMat.setFloat('_xShiftC', texC_x.value);
+			shaderMat.setFloat('_yShiftC', texC_y.value);
+			shaderMat.setFloat('_uvRotateC', texC_r.value);
+			shaderMat.setFloat('_briC', texC_b.value);
+			shaderMat.setFloat('_conC', texC_c.value);
+			shaderMat.setFloat('_cmC', texC_cm.value);
+			shaderMat.setColor4("_colC", texC_col);
+			shaderMat.setFloat('_xSizeD', texD_s.value);
+			shaderMat.setFloat('_ySizeD', texD_s.value);
+			shaderMat.setFloat('_xShiftD', texD_x.value);
+			shaderMat.setFloat('_yShiftD', texD_y.value);
+			shaderMat.setFloat('_uvRotateD', texD_r.value);
+			shaderMat.setFloat('_briD', texD_b.value);
+			shaderMat.setFloat('_conD', texD_c.value);
+			shaderMat.setFloat('_cmD', texD_cm.value);
+			shaderMat.setColor4("_colD", texD_col);
+			shaderMat.setFloat('_xSizeE', texE_s.value);
+			shaderMat.setFloat('_ySizeE', texE_s.value);
+			shaderMat.setFloat('_xShiftE', texE_x.value);
+			shaderMat.setFloat('_yShiftE', texE_y.value);
+			shaderMat.setFloat('_uvRotateE', texE_r.value);
+			shaderMat.setFloat('_briE', texE_b.value);
+			shaderMat.setFloat('_conE', texE_c.value);
+			shaderMat.setFloat('_cmE', texE_cm.value);
+			shaderMat.setColor4("_colE", texE_col);
+			shaderMat.setFloat('_xSizeF', texF_s.value);
+			shaderMat.setFloat('_ySizeF', texF_s.value);
+			shaderMat.setFloat('_xShiftF', texF_x.value);
+			shaderMat.setFloat('_yShiftF', texF_y.value);
+			shaderMat.setFloat('_uvRotateF', texF_r.value);
+			shaderMat.setFloat('_briF', texF_b.value);
+			shaderMat.setFloat('_conF', texF_c.value);
+			shaderMat.setFloat('_cmF', texF_cm.value);
+			shaderMat.setColor4("_colF", texF_col);
+
+			shaderMat.setInt('_btySwitch', 1);
+			// shaderMat.AddUniform('blend', 'float');
+			// shaderMat.onBindObservable.add(function () {
+			//     shaderMat.getEffect().setFloat('blend', blend);D
+			// });
+
+
+			//SHADERZ
+			BABYLON.Effect.ShadersStore["customVertexShader"] = `
+				precision highp float;
+		
+				vec2 rotateUV(vec2 uv, vec2 pivot, float rotation) {
+					float cosa = cos(rotation);
+					float sina = sin(rotation);
+					uv -= pivot;
+					return vec2(
+						cosa * uv.x - sina * uv.y,
+						cosa * uv.y + sina * uv.x 
+					) + pivot;
+				}
+		
+				// Attributes
+				attribute vec3 position;
+				attribute vec2 uv;
+		
+				// Uniforms
+				uniform mat4 worldViewProjection;
+				// uniform float _uvRotateA;
+		
+				// Varying
+				varying vec2 vUV;
+		
+				void main(void) {
+					gl_Position = worldViewProjection * vec4(position, 1.0);
+					vUV = rotateUV(uv, vec2(0.5, 0.5), 0.0);
+				}
+				
+			`
+			BABYLON.Effect.ShadersStore["customFragmentShader"] = `
+				varying vec2 vUV;
+		
+				uniform sampler2D texBeauty;
+				uniform sampler2D texDiff;
+				// uniform sampler2D texSpec;
+				uniform sampler2D texRefl;
+				uniform sampler2D texOccl;
+				uniform sampler2D texMask1;
+				uniform sampler2D texMask2;
+				uniform sampler2D texAlpha2;
+				uniform sampler2D texUV;
+				uniform float uTime;
+
+				uniform sampler2D texCustomR;
+				uniform float _xSizeA;
+				uniform float _ySizeA;
+				uniform float _xShiftA;
+				uniform float _yShiftA;
+				uniform float _uvRotateA;
+				uniform float _briA;
+				uniform float _conA;
+				uniform float _cmA;
+				uniform vec4 _colA;
+				uniform sampler2D texCustomG;
+				uniform float _xSizeB;
+				uniform float _ySizeB;
+				uniform float _xShiftB;
+				uniform float _yShiftB;
+				uniform float _uvRotateB;
+				uniform float _briB;
+				uniform float _conB;
+				uniform float _cmB;
+				uniform vec4 _colB;
+				uniform sampler2D texCustomB;
+				uniform float _xSizeC;
+				uniform float _ySizeC;
+				uniform float _xShiftC;
+				uniform float _yShiftC;
+				uniform float _uvRotateC;
+				uniform float _briC;
+				uniform float _conC;
+				uniform float _cmC;
+				uniform vec4 _colC;
+				uniform sampler2D texCustomC;
+				uniform float _xSizeD;
+				uniform float _ySizeD;
+				uniform float _xShiftD;
+				uniform float _yShiftD;
+				uniform float _uvRotateD;
+				uniform float _briD;
+				uniform float _conD;
+				uniform float _cmD;
+				uniform vec4 _colD;
+				uniform sampler2D texCustomM;
+				uniform float _xSizeE;
+				uniform float _ySizeE;
+				uniform float _xShiftE;
+				uniform float _yShiftE;
+				uniform float _uvRotateE;
+				uniform float _briE;
+				uniform float _conE;
+				uniform float _cmE;
+				uniform vec4 _colE;
+				uniform sampler2D texCustomY;
+				uniform float _xSizeF;
+				uniform float _ySizeF;
+				uniform float _xShiftF;
+				uniform float _yShiftF;
+				uniform float _uvRotateF;
+				uniform float _briF;
+				uniform float _conF;
+				uniform float _cmF;
+				uniform vec4 _colF;
+				uniform sampler2D texCustomW;
+				uniform float _xSizeG;
+				uniform float _ySizeG;
+				uniform float _xShiftG;
+				uniform float _yShiftG;
+				uniform float _uvRotateG;
+				uniform float _briG;
+				uniform float _conG;
+				uniform float _cmG;
+				uniform vec4 _colG;
+
+				uniform int _btySwitch;
+		
+				void main(void)
+				{
+					vec4 colBeauty = texture2D(texBeauty, vUV);
+					vec4 colDiff = texture2D(texDiff, vUV);
+					// vec4 colSpec = texture2D(texSpec, vUV);
+					vec4 colRefl = texture2D(texRefl, vUV);
+					vec4 colOccl = texture2D(texOccl, vUV);
+					vec4 colMask1 = texture2D(texMask1, vUV);
+					vec4 colMask2 = texture2D(texMask2, vUV);
+					vec4 colAlpha2 = texture2D(texAlpha2, vUV);
+					vec4 colUV = texture2D(texUV, vUV);
+		
+					vec4 colFinal;
+					colFinal = vec4(-1.,-1.,-1.,1.);
+					colFinal = colBeauty;
+					vec4 wht = vec4(1,1,1,1);
+					float mixMax = 0.0;
+					// float _btySwitch = 1.0;
+
+					float maskT = 0.0;
+					if(((colMask1.r > maskT || colMask1.g > maskT || colMask1.b > maskT)
+					|| (colMask2.r > maskT || colMask2.g > maskT || colMask2.b > maskT))
+					&& _btySwitch>0){
+						vec2 newUV_A;
+						vec2 newUV_B;
+						vec2 newUV_C;
+						vec2 newUV_D;
+						vec2 newUV_E;
+						vec2 newUV_F;
+						vec2 newUV_G;
+						vec4 colCustA;
+						vec4 colCustB;
+						vec4 colCustC;
+						vec4 colCustD;
+						vec4 colCustE;
+						vec4 colCustF;
+						vec4 colCustG;
+						
+						if(colMask1.r > maskT){
+							//TEX_A RED
+							float angleA = _uvRotateA;
+							float sinA = sin(angleA);
+							float cosA = cos(angleA);
+							mat2 rotationMatrixA = mat2( cosA, sinA, -sinA, cosA);
+							vec2 pivotA = vec2( 0.5, -0.5);
+							newUV_A = vec2(_xSizeA * (colUV.r + colUV.b/256.0 + _xShiftA) - (_xSizeA*0.5) +0.5, _ySizeA * (-colUV.g -colUV.a/256.0 + _yShiftA) + (_ySizeA*0.5) - 0.5);
+							newUV_A = rotationMatrixA * (newUV_A - pivotA) + pivotA;
+						}
+						if(colMask1.g > maskT){
+							//TEX_B GREEN
+							float angleB = _uvRotateB;
+							float sinB = sin(_uvRotateB);
+							float cosB = cos(angleB);
+							mat2 rotationMatrixB = mat2( cosB, sinB, -sinB, cosB);
+							vec2 pivotB = vec2( 0.5, -0.5);
+							newUV_B = vec2(_xSizeB * (colUV.r + colUV.b/256.0 + _xShiftB) - (_xSizeB*0.5) +0.5, _ySizeB * (-colUV.g -colUV.a/256.0 + _yShiftB) + (_ySizeB*0.5) - 0.5);
+							newUV_B = rotationMatrixB * (newUV_B - pivotB) + pivotB;
+						}
+						if(colMask1.b > maskT){
+							//TEX_C BLUE
+							float angleC = _uvRotateC;
+							float sinC = sin(_uvRotateC);
+							float cosC = cos(angleC);
+							mat2 rotationMatrixC = mat2( cosC, sinC, -sinC, cosC);
+							vec2 pivotC = vec2( 0.5, -0.5);
+							newUV_C = vec2(_xSizeC * (colUV.r + colUV.b/256.0 + _xShiftC) - (_xSizeC*0.5) +0.5, _ySizeC * (-colUV.g -colUV.a/256.0 + _yShiftC) + (_ySizeC*0.5) - 0.5);
+							newUV_C = rotationMatrixC * (newUV_C - pivotC) + pivotC;
+						}
+						// if(colMask1.b > maskT && colMask1.g > maskT){
+						if(colMask2.r > maskT){
+							//TEX_D CYAN
+							float angleD = _uvRotateD;
+							float sinD = sin(angleD);
+							float cosD = cos(angleD);
+							mat2 rotationMatrixD = mat2( cosD, sinD, -sinD, cosD);
+							vec2 pivotD = vec2( 0.5, -0.5);
+							newUV_D = vec2(_xSizeD * (colUV.r + colUV.b/256.0 + _xShiftD) - (_xSizeD*0.5) +0.5, _ySizeD * (-colUV.g -colUV.a/256.0 + _yShiftD) + (_ySizeD*0.5) - 0.5);
+							newUV_D = rotationMatrixD * (newUV_D - pivotD) + pivotD;
+						}
+						// if(colMask1.b > maskT && colMask1.r > maskT){
+						if(colMask2.g > maskT){
+							//TEX_E MAG
+							float angleE = _uvRotateE;
+							float sinE = sin(angleE);
+							float cosE = cos(angleE);
+							mat2 rotationMatrixE = mat2( cosE, sinE, -sinE, cosE);
+							vec2 pivotE = vec2( 0.5, -0.5);
+							newUV_E = vec2(_xSizeE * (colUV.r + colUV.b/256.0 + _xShiftE) - (_xSizeE*0.5) +0.5, _ySizeE * (-colUV.g -colUV.a/256.0 + _yShiftE) + (_ySizeE*0.5) - 0.5);
+							newUV_E = rotationMatrixE * (newUV_E - pivotE) + pivotE;
+						}
+						// if(colMask1.g > maskT && colMask1.r > maskT){
+						if(colMask2.b > maskT){
+							//TEX_F YEL
+							float angleF = _uvRotateF;
+							float sinF = sin(angleF);
+							float cosF = cos(angleF);
+							mat2 rotationMatrixF = mat2( cosF, sinF, -sinF, cosF);
+							vec2 pivotF = vec2( 0.5, -0.5);
+							newUV_F = vec2(_xSizeF * (colUV.r + colUV.b/256.0 + _xShiftF) - (_xSizeF*0.5) +0.5, _ySizeF * (-colUV.g -colUV.a/256.0 + _yShiftF) + (_ySizeF*0.5) - 0.5);
+							newUV_F = rotationMatrixF * (newUV_F - pivotF) + pivotF;
+						}
+						// if(colMask1.r > maskT && colMask1.g > maskT && colMask1.b > maskT){
+						//     //TEX_G WHITE
+						//     float angleG = _uvRotateG;
+						//     float sinG = sin(angleG);
+						//     float cosG = cos(angleG);
+						//     mat2 rotationMatrixG = mat2( cosG, sinG, -sinG, cosG);
+						//     vec2 pivotG = vec2( 0.5, -0.5);
+						//     newUV_G = vec2(_xSizeG * (colUV.r + colUV.b/256.0 + _xShiftG) - (_xSizeG*0.5) +0.5, _ySizeG * (-colUV.g -colUV.a/256.0 + _yShiftG) + (_ySizeG*0.5) - 0.5);
+						//     newUV_G = rotationMatrixG * (newUV_G - pivotG) + pivotG;
+						// }
+
+						////LOGIC
+						bool mask1Dirty = false;
+						bool mask2Dirty = false;
+						float alphaMul = 5.0;
+						//RED
+						if(colMask1.r > 0.0){
+							// colCustA = texture2D(texCustomR, vec2(_xSizeA * (colUV.r + colUV.b/256.0 + _xShiftA), _ySizeA * (colUV.g + colUV.a/256.0 + _yShiftA)));
+							colCustA = texture2D(texCustomR, newUV_A);
+							colCustA = colCustA * (wht- (wht-_colA)* _cmA);
+							colCustA = colCustA + _briA;
+							colCustA = (colCustA - 0.5) * _conA + 0.5;
+							colFinal = mix(colFinal, colCustA, colMask1.r);
+							mixMax = max(mixMax, colMask1.r);
+						}
+						//GRE
+						if(colMask1.g > 0.0){
+							colCustB = texture2D(texCustomG, newUV_B);
+							colCustB = colCustB * (wht- (wht-_colB)* _cmB);
+							colCustB = colCustB + _briB;
+							colCustB = (colCustB - 0.5) * _conB + 0.5;
+							colFinal = mix(colFinal, colCustB, colMask1.g);
+							mixMax = max(mixMax, colMask1.g);
+						}
+						//BLU
+						if(colMask1.b > 0.0){
+							colCustC = texture2D(texCustomB, newUV_C);
+							colCustC = colCustC * (wht- (wht-_colC)* _cmC);
+							colCustC = colCustC + _briC;
+							colCustC = (colCustC - 0.5) * _conC + 0.5;
+							colFinal = mix(colFinal, colCustC, colMask1.b);
+							mixMax = max(mixMax, colMask1.b);
+						}
+						//RED2
+						if(colMask2.r > 0.0){
+							colCustD = texture2D(texCustomC, newUV_D);
+							colCustD = colCustD * (wht- (wht-_colD)* _cmD);
+							colCustD = colCustD + _briD;
+							colCustD = (colCustD - 0.5) * _conD + 0.5;
+							colFinal = mix(colFinal, colCustD, colMask2.r*(colAlpha2.r>0.0?colAlpha2.r:1.0));
+							// colFinal = mix(colFinal, colCustD, clamp(colMask2.r + (0.5*(1.-colMask2.r)),0.0, 1.0));
+							// colFinal = colCustD;
+							// mixMax = max(mixMax, colMask2.r);
+							mixMax += colMask2.r*(colAlpha2.r>0.0?colAlpha2.r:1.0);
+							mixMax += colAlpha2.r>0.0 ? colAlpha2.r/(alphaMul) + (1.-(1./(alphaMul))) : 0.0;
+							// mixMax = 1.0;
+						}
+						//GRE2
+						if(colMask2.g > 0.0){
+							colCustE = texture2D(texCustomM, newUV_E);
+							colCustE = colCustE * (wht- (wht-_colE)* _cmE);
+							colCustE = colCustE + _briE;
+							colCustE = (colCustE - 0.5) * _conE + 0.5;
+							colFinal = mix(colFinal, colCustE, colMask2.g*(colAlpha2.g>0.0?colAlpha2.g:1.0));
+							// colFinal = mix(colFinal, colCustE, clamp(colMask2.g + (0.5*(1.-colMask2.g)),0.0, 1.0));
+							// colFinal = colCustE;
+							// mixMax = max(mixMax, colMask2.g);
+							mixMax += colMask2.g*(colAlpha2.g>0.0?colAlpha2.g:1.0);
+							mixMax += colAlpha2.g>0.0 ? colAlpha2.g/(alphaMul) + (1.-(1./(alphaMul))) : 0.0;
+							// mixMax = 1.0;
+						}
+						//BLU2
+						if(colMask2.b > 0.0){
+							colCustF = texture2D(texCustomY, newUV_F);
+							colCustF = colCustF * (wht- (wht-_colF)* _cmF);
+							colCustF = colCustF + _briF;
+							colCustF = (colCustF - 0.5) * _conF + 0.5;
+							colFinal = mix(colFinal, colCustF, colMask2.b*(colAlpha2.b>0.0?colAlpha2.b:1.0));
+							// colFinal = mix(colFinal, colCustF, clamp(colMask2.b + (0.5*(1.-colMask2.b)),0.0, 1.0));
+							// colFinal = colCustF;
+							// mixMax = max(mixMax, colMask2.b);
+							mixMax += colMask2.b*(colAlpha2.b>0.0?colAlpha2.b:1.0);
+							mixMax += colAlpha2.b>0.0 ? colAlpha2.b/(alphaMul) + (1.-(1./(alphaMul))) : 0.0;
+							// mixMax = 1.0;
+						}
+
+						colFinal.a = 1.0;
+			
+						// vec4 colFinal = texture2D(texCustomR, vec2(_xSizeA * (colUV.r + colUV.b/256.0 + _xShiftA), _ySizeA * (colUV.g + colUV.a/256.0 + _yShiftA)));
+						//// vec4 colFinal = texture2D(texCustomR, vec2(_xSizeA * (colUV.r + _xShiftA), _ySizeA * (colUV.g + _yShiftA)));
+						//// vec4 colFinal = texture2D(texCustomR, vec2(colUV.r, colUV.g));
+						
+						gl_FragColor = colFinal;
+						// gl_FragColor = colFinal*(pow(colOccl.r, 3.));
+						// gl_FragColor = colFinal*(colOccl*colOccl*colOccl);
+						// gl_FragColor = colFinal*(colDiff)*(colOccl) + colRefl;
+					
+					}
+					else{
+						gl_FragColor = vec4(1,0,1,1);
+						gl_FragColor = colBeauty*(colDiff)*(colOccl) + colRefl;
+						gl_FragColor = colBeauty;
+					}
+					// gl_FragColor = gl_FragColor*(colDiff)*(colOccl) + colRefl;
+					// gl_FragColor = _btySwitch==0?mix(colBeauty, gl_FragColor*(colDiff)*(colOccl) + colRefl, mixMax):gl_FragColor*(colDiff)*(colOccl) + colRefl;
+					gl_FragColor = mix(colBeauty, gl_FragColor*(colDiff)*(colOccl) + colRefl, clamp(mixMax, 0., 1.));
+					// gl_FragColor = vec4(mixMax, mixMax, mixMax, 1.0);
+		
+				}
+		
+			`
+
+			sphere.material = sphereMat;
+			plane.material = shaderMat;
+
+			return scene;
+		};
+		var engine;
+		try {
+			engine = createDefaultEngine();
+		} catch (e) {
+			console.log("the available createEngine function failed. Creating the default engine instead");
+			engine = createDefaultEngine();
+		}
+		if (!engine) throw 'engine should not be null.';
+
+		// scene = createScene();
+		// sceneToRender = scene;
+
+		engine.runRenderLoop(function () {
+			if (sceneToRender) {
+				sceneToRender.render();
+			}
+		});
+
+		// Resize
+		window.addEventListener("resize", function () {
+			engine.resize();
+		});
+
+		function sleep(milliseconds) {
+			var start = new Date().getTime();
+			for (var i = 0; i < 1e7; i++) {
+				if ((new Date().getTime() - start) > milliseconds) {
+					break;
+				}
+			}
+		}
+	</script>
+</body>
+
+</html>
